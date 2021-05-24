@@ -335,7 +335,7 @@ class FixClient:
         })
 
     def send_order(self, symbol: str, side: str, price: Decimal, size: Decimal,
-                   reduce_only: bool = False, client_order_id: Optional[str] = None,
+                   reduce_only: bool = False, post_only: bool = False, client_order_id: Optional[str] = None,
                    ioc: bool = False) -> None:
         self.send({
             simplefix.TAG_MSGTYPE: simplefix.MSGTYPE_NEW_ORDER_SINGLE,
@@ -349,7 +349,8 @@ class FixClient:
             simplefix.TAG_ORDTYPE: simplefix.ORDTYPE_LIMIT,
             simplefix.TAG_TIMEINFORCE: simplefix.TIMEINFORCE_GOOD_TILL_CANCEL if not ioc else \
                 simplefix.TIMEINFORCE_IMMEDIATE_OR_CANCEL,
-            **({simplefix.TAG_EXECINST: simplefix.EXECINST_DO_NOT_INCREASE} if reduce_only else {}),
+            **({simplefix.TAG_EXECINST: simplefix.EXECINST_DO_NOT_INCREASE} if reduce_only else \
+               {simplefix.TAG_EXECINST: simplefix.EXECINST_PARTICIPATE_DONT_INITIATE} if post_only else {}),
         })
 
     def cancel_order(self, order_id: Optional[str] = None,
